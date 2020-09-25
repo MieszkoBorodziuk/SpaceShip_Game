@@ -1,4 +1,6 @@
-import { Spaceship } from './Spaceship.js'
+import { Spaceship } from './Spaceship.js';
+import { Enemy } from './Enemy.js';
+
 
 class Game {
     #htmlElement = {
@@ -7,19 +9,51 @@ class Game {
     };
     #ship = new Spaceship(this.#htmlElement.spaceship, this.#htmlElement.container);
 
+    #enemies = [];
+    #enemiesInteval = null;
     #checkPositionInterval = null;
+    #createEnemyinterval = null;
 
     init() {
         this.#ship.init();
         this.#newGame();
-    }
+    };
 
     #newGame() {
+        this.#enemiesInteval = 30;
+        this.#createEnemyinterval = setInterval(() => this.#randomNewEnemy(), 1000);
         this.#checkPositionInterval = setInterval(() => this.#checkPosition(), 1);
-    }
+    };
+
+    #randomNewEnemy() {
+        const randomNumber = Math.floor(Math.random() * 5) + 1;
+        randomNumber % 5 ? this.#createNewEnemy(this.#htmlElement.container, this.#enemiesInteval, 'enemy')
+            : this.#createNewEnemy(this.#htmlElement.container, this.#enemiesInteval * 2, 'enemy--big', 3);
+    };
+
+
+    #createNewEnemy(...params) {
+        const enemy = new Enemy(...params);
+        enemy.init();
+        this.#enemies.push(enemy);
+    };
+
+
     #checkPosition() {
-        this.#ship.missiles.forEach((missile, missileIndex, missileArr) =>
-        {
+        this.#enemies.forEach((enemy, enemyIndex, enemiesArr) => {
+            const enemyPosition = {
+                top: enemy.element.offsetTop,
+                right: enemy.element.offsetLeft + enemy.element.offsetWidth,
+                bottom: enemy.element.offsetTop + enemy.element.offsetHeight,
+                left: enemy.element.offsetLeft,
+            }
+            if (enemyPosition.top > window.innerHeight) {
+                enemy.remove();
+                enemiesArr.splice(enemyIndex, 1);
+            }
+        });
+
+        this.#ship.missiles.forEach((missile, missileIndex, missileArr) => {
             const missilePosition = {
                 top: missile.element.offsetTop,
                 right: missile.element.offsetLeft + missile.element.offsetWidth,
@@ -30,7 +64,7 @@ class Game {
                 missile.remove();
                 missileArr.splice(missileIndex, 1);
             }
-        })
+        });
     }
 }
 

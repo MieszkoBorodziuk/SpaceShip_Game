@@ -89,6 +89,8 @@ box-sizing: border-box;
     height: var(--size-unit);
     background-image: url('../images/enemy.png');
     animation: move-5-units-X var(--ships-animation-time) steps(5) infinite;
+    z-index: 1;
+    position: fixed;
 }
 
 .enemy--big {
@@ -96,6 +98,7 @@ box-sizing: border-box;
     height: calc(var(--size-unit) *2);
     background-image: url('../images/enemy-big.png');
     animation: move-16-units-X var(--ships-animation-time) steps(8) infinite;
+    position: fixed;
 }
 
 .explosion {
