@@ -8,6 +8,9 @@ class Game {
         container: document.querySelector('[data-container]'),
         score: document.querySelector('[data-score]'),
         lives: document.querySelector('[data-lives]'),
+        modal: document.querySelector('[data-modal]'),
+        scoreInfo: document.querySelector('[data-score-info]'),
+        button: document.querySelector('[data-button]'),
     };
     #ship = new Spaceship(this.#htmlElement.spaceship, this.#htmlElement.container);
 
@@ -16,20 +19,35 @@ class Game {
     #score = 0;
     #enemiesInteval = null;
     #checkPositionInterval = null;
-    #createEnemyinterval = null;
+    #createEnemyInterval = null;
 
     init() {
         this.#ship.init();
         this.#newGame();
+        this.#htmlElement.button.addEventListener('click', () => this.#newGame());
     };
 
     #newGame() {
+        this.#htmlElement.modal.classList.add('hide');
         this.#enemiesInteval = 30;
         this.#lives = 3;
-        this.score = 0;
-        this.#createEnemyinterval = setInterval(() => this.#randomNewEnemy(), 1000);
+        this.#score = 0;
+        this.#updateLivesText();
+        this.#updateScoreText();
+        this.#ship.element.style.left = '0';
+        this.#ship.setPosition();
+        this.#createEnemyInterval = setInterval(() => this.#randomNewEnemy(), 1000);
         this.#checkPositionInterval = setInterval(() => this.#checkPosition(), 1);
     };
+    #endGame() {
+        this.#htmlElement.modal.classList.remove('hide');
+        this.#htmlElement.scoreInfo.textContent = `You loose! Your score is: ${this.#score}`;
+        this.#enemies.forEach((enemy) => enemy.explode());
+        this.#enemies.length = 0;
+        clearInterval(this.#createEnemyInterval);
+        clearInterval(this.#checkPositionInterval);
+
+    }
 
     #randomNewEnemy() {
         const randomNumber = Math.floor(Math.random() * 5) + 1;
@@ -94,6 +112,9 @@ class Game {
         this.#updateLivesText();
         this.#htmlElement.container.classList.add('hit');
         setTimeout(() => this.#htmlElement.container.classList.remove('hit'), 100);
+        if(!this.#lives){
+            this.#endGame();
+        }
     }
     #updateScoreText() {
         this.#htmlElement.score.textContent = `Score: ${this.#score}`;
