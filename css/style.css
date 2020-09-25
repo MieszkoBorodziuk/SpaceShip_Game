@@ -106,6 +106,7 @@ box-sizing: border-box;
     height: var(--size-unit);
     background-image: url('../images/explosion.png');
     animation: move-17-units-X var(--explosions-animation-time) steps(17) forwards;
+    position: fixed;
 }
 
 .explosion--big {
@@ -113,6 +114,7 @@ box-sizing: border-box;
     height: calc(var(--size-unit) *2);
     background-image: url('../images/explosion-big.png');
     animation: move-34-units-X var(--explosions-animation-time) steps(17) forwards;
+    position: fixed;
 }
 
 .missile {
