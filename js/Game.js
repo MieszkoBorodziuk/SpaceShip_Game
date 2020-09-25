@@ -6,10 +6,14 @@ class Game {
     #htmlElement = {
         spaceship: document.querySelector('[data-spaceship]'),
         container: document.querySelector('[data-container]'),
+        score: document.querySelector('[data-score]'),
+        lives: document.querySelector('[data-lives]'),
     };
     #ship = new Spaceship(this.#htmlElement.spaceship, this.#htmlElement.container);
 
     #enemies = [];
+    #lives = 0;
+    #score = 0;
     #enemiesInteval = null;
     #checkPositionInterval = null;
     #createEnemyinterval = null;
@@ -21,6 +25,8 @@ class Game {
 
     #newGame() {
         this.#enemiesInteval = 30;
+        this.#lives = 3;
+        this.score = 0;
         this.#createEnemyinterval = setInterval(() => this.#randomNewEnemy(), 1000);
         this.#checkPositionInterval = setInterval(() => this.#checkPosition(), 1);
     };
@@ -48,8 +54,9 @@ class Game {
                 left: enemy.element.offsetLeft,
             }
             if (enemyPosition.top > window.innerHeight) {
-                enemy.remove();
+                enemy.explode();
                 enemiesArr.splice(enemyIndex, 1);
+                this.#updateLives();
             }
             this.#ship.missiles.forEach((missile, missileIndex, missileArr) => {
                 const missilePosition = {
@@ -60,11 +67,12 @@ class Game {
                 }
                 if (missilePosition.bottom >= enemyPosition.top && missilePosition.top <= enemyPosition.bottom && missilePosition.right >= enemyPosition.left && missilePosition.left <= enemyPosition.right) {
                     enemy.hit();
-                    if(!enemy.lives) {
+                    if (!enemy.lives) {
                         enemiesArr.splice(enemyIndex, 1);
                     }
                     missile.remove();
                     missileArr.splice(missileIndex, 1);
+                    this.#updateScore();
                 }
                 if (missilePosition.bottom < 0) {
                     missile.remove();
@@ -73,6 +81,25 @@ class Game {
             });
         });
 
+    }
+    #updateScore() {
+        this.#score++;
+        if (!(this.#score % 5)) {
+            this.#enemiesInteval--;
+        };
+        this.#updateScoreText();
+    }
+    #updateLives() {
+        this.#lives--;
+        this.#updateLivesText();
+        this.#htmlElement.container.classList.add('hit');
+        setTimeout(() => this.#htmlElement.container.classList.remove('hit'), 100);
+    }
+    #updateScoreText() {
+        this.#htmlElement.score.textContent = `Score: ${this.#score}`;
+    }
+    #updateLivesText() {
+        this.#htmlElement.lives.textContent = `Lives: ${this.#lives}`;
     }
 }
 
